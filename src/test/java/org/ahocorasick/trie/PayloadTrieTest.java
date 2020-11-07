@@ -449,8 +449,9 @@ public class PayloadTrieTest {
         assertEquals(textSize / interval, emits.size());
     }
 
+    // @see https://github.com/robert-bor/aho-corasick/issues/85
     @Test
-    public void testWholeWords() {
+    public void wholeWords() {
         PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword("foo", "bar").onlyWholeWords().build();
 
         // access via PayloadTrie.parseText(CharSequence)
@@ -461,6 +462,24 @@ public class PayloadTrieTest {
         Collection<PayloadEmit<String>> result2 = new LinkedList<>();
         trie.parseText("foobar", result2::add);
 
+        assertTrue(result1.isEmpty());
+        assertEquals(result1, result2);
+    }
+
+    // @see https://github.com/robert-bor/aho-corasick/issues/85
+    @Test
+    public void wholeWordsWhiteSpaceSeparated() {
+        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword("foo", "bar").onlyWholeWordsWhiteSpaceSeparated().build();
+
+        // access via PayloadTrie.parseText(CharSequence)
+        Collection<PayloadEmit<String>> result1 = trie.parseText("foo#bar");
+
+
+        // access via PayloadTrie.parseText(CharSequence, PayloadEmitHandler<String>)
+        Collection<PayloadEmit<String>> result2 = new LinkedList<>();
+        trie.parseText("foo#bar", result2::add);
+
+        assertTrue(result1.isEmpty());
         assertEquals(result1, result2);
     }
 

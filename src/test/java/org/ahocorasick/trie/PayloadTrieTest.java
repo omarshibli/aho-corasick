@@ -3,7 +3,7 @@ package org.ahocorasick.trie;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -213,7 +213,7 @@ public class PayloadTrieTest {
     public void ushersTestByCallback() {
         PayloadTrie<Integer> trie = PayloadTrie.<Integer>builder().addKeywords(PRONOUNS_WITH_PAYLOADS).build();
 
-        final List<PayloadEmit<Integer>> emits = new ArrayList<>();
+        final List<PayloadEmit<Integer>> emits = new LinkedList<>();
         PayloadEmitHandler<Integer> emitHandler = new PayloadEmitHandler<Integer>() {
 
             @Override
@@ -447,6 +447,21 @@ public class PayloadTrieTest {
         final Collection<PayloadEmit<Food>> emits = trie.parseText(text);
 
         assertEquals(textSize / interval, emits.size());
+    }
+
+    @Test
+    public void testWholeWords() {
+        PayloadTrie<String> trie = PayloadTrie.<String>builder().addKeyword("foo", "bar").onlyWholeWords().build();
+
+        // access via PayloadTrie.parseText(CharSequence)
+        Collection<PayloadEmit<String>> result1 = trie.parseText("foobar");
+
+
+        // access via PayloadTrie.parseText(CharSequence, PayloadEmitHandler<String>)
+        Collection<PayloadEmit<String>> result2 = new LinkedList<>();
+        trie.parseText("foobar", result2::add);
+
+        assertEquals(result1, result2);
     }
 
     /**
